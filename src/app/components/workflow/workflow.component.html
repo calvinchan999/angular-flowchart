@@ -1,0 +1,129 @@
+<div class="workflow-container">
+  <!-- Palette -->
+  <div class="palette">
+    <h3>Actions</h3>
+    <div class="palette-categories">
+      <div class="category">
+        <h4>Basic</h4>
+        <div class="palette-items">
+          <div *ngFor="let item of items | filterByTypes:['start', 'move', 'rotate', 'wait']" 
+               class="palette-item"
+               [ngFlowchartStep]="{
+                 template: stepTemplate,
+                 type: item.type,
+                 data: item.data
+               }">
+            <mat-icon>{{item.icon}}</mat-icon>
+            <span>{{ item.name }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="category">
+        <h4>Control Flow</h4>
+        <div class="palette-items">
+          <div *ngFor="let item of items | filterByTypes:['condition', 'repeat', 'event']" 
+               class="palette-item"
+               [ngFlowchartStep]="{
+                 template: stepTemplate,
+                 type: item.type,
+                 data: item.data
+               }">
+            <mat-icon>{{item.icon}}</mat-icon>
+            <span>{{ item.name }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="category">
+        <h4>Effects</h4>
+        <div class="palette-items">
+          <div *ngFor="let item of items | filterByTypes:['sound']" 
+               class="palette-item"
+               [ngFlowchartStep]="{
+                 template: stepTemplate,
+                 type: item.type,
+                 data: item.data
+               }">
+            <mat-icon>{{item.icon}}</mat-icon>
+            <span>{{ item.name }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Canvas -->
+  <div class="canvas-container">
+    <div class="canvas"
+         ngFlowchartCanvas
+         [ngFlowchartOptions]="options"
+         [ngFlowchartCallbacks]="callbacks">
+    </div>
+  </div>
+
+  <!-- Properties Panel -->
+  <div class="properties-panel" *ngIf="selectedStep">
+    <h3>Properties</h3>
+    <div [ngSwitch]="selectedStep.type">
+      <!-- Move Properties -->
+      <div *ngSwitchCase="'move'" class="properties-form">
+        <mat-form-field appearance="outline">
+          <mat-label>X Position</mat-label>
+          <input matInput type="number" [(ngModel)]="selectedStep.data.params.x">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Y Position</mat-label>
+          <input matInput type="number" [(ngModel)]="selectedStep.data.params.y">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Speed</mat-label>
+          <input matInput type="number" [(ngModel)]="selectedStep.data.params.speed">
+        </mat-form-field>
+      </div>
+
+      <!-- Rotate Properties -->
+      <div *ngSwitchCase="'rotate'" class="properties-form">
+        <mat-form-field appearance="outline">
+          <mat-label>Degrees</mat-label>
+          <input matInput type="number" [(ngModel)]="selectedStep.data.params.degrees">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Speed</mat-label>
+          <input matInput type="number" [(ngModel)]="selectedStep.data.params.speed">
+        </mat-form-field>
+      </div>
+
+      <!-- Other property forms... -->
+    </div>
+  </div>
+</div>
+
+<!-- Step Template -->
+<ng-template #stepTemplate let-step>
+  <div class="workflow-step" [ngClass]="step.type">
+    <div class="step-wrapper">
+      <div class="step-header">
+        <mat-icon>{{getIconForType(step.type)}}</mat-icon>
+        <span>{{step.data.name}}</span>
+        <button mat-icon-button class="delete-btn" (click)="deleteStep(step)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+      <div class="step-content" *ngIf="step.data.params">
+        <ng-container [ngSwitch]="step.type">
+          <span *ngSwitchCase="'move'">
+            Move to ({{step.data.params.x}}, {{step.data.params.y}})
+          </span>
+          <span *ngSwitchCase="'rotate'">
+            Rotate {{step.data.params.degrees}}°
+          </span>
+          <span *ngSwitchCase="'wait'">
+            Wait {{step.data.params.seconds}}s
+          </span>
+          <!-- Add more cases for other types -->
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</ng-template> 

@@ -1,0 +1,122 @@
+.workflow-container {
+  display: flex;
+  height: 100vh;
+  
+  .palette {
+    width: 250px;
+    padding: 20px;
+    background: #f5f5f5;
+    border-right: 1px solid #ddd;
+    overflow-y: auto;
+    
+    h3 {
+      margin: 0 0 16px 0;
+      color: #333;
+    }
+
+    .category {
+      margin-bottom: 24px;
+
+      h4 {
+        margin: 0 0 8px 0;
+        color: #666;
+        font-size: 14px;
+      }
+    }
+    
+    .palette-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px;
+      margin-bottom: 8px;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      cursor: move;
+      
+      mat-icon {
+        color: #666;
+      }
+      
+      &:hover {
+        background: #f8f8f8;
+        border-color: #999;
+      }
+    }
+  }
+  
+  .canvas-container {
+    flex: 1;
+    background: white;
+    
+    .canvas {
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  .properties-panel {
+    width: 300px;
+    padding: 20px;
+    background: #f5f5f5;
+    border-left: 1px solid #ddd;
+
+    .properties-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+  }
+}
+
+.workflow-step {
+  min-width: 200px;
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  
+  .step-wrapper {
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+      position: relative;
+      
+      mat-icon {
+        font-size: 20px;
+      }
+
+      .delete-btn {
+        position: absolute;
+        right: 4px;
+        top: 50%;
+        transform: translateY(-50%);
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+    }
+    
+    .step-content {
+      padding: 12px;
+      font-size: 14px;
+      color: #666;
+    }
+  }
+  
+  &.move { border-left: 4px solid #2196F3; }
+  &.rotate { border-left: 4px solid #9C27B0; }
+  &.wait { border-left: 4px solid #FF9800; }
+  &.condition { border-left: 4px solid #4CAF50; }
+  &.repeat { border-left: 4px solid #F44336; }
+  &.event { border-left: 4px solid #009688; }
+  &.sound { border-left: 4px solid #673AB7; }
+
+  &:hover {
+    .delete-btn {
+      opacity: 1;
+    }
+  }
+} 
