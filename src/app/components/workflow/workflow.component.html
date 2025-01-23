@@ -2,9 +2,10 @@
   <!-- Palette -->
   <div class="palette">
     <h3>Actions</h3>
-    <div class="palette-categories">
-      <div class="category">
-        <h4>Basic</h4>
+    <div class="palette-list">
+      <!-- Basic Actions -->
+      <div class="palette-section">
+        <div class="section-header">Basic</div>
         <div class="palette-items">
           <div *ngFor="let item of items | filterByTypes:['start', 'move', 'rotate', 'wait']" 
                class="palette-item"
@@ -13,14 +14,18 @@
                  type: item.type,
                  data: item.data
                }">
-            <mat-icon>{{item.icon}}</mat-icon>
-            <span>{{ item.name }}</span>
+            <mat-icon class="item-icon">{{item.icon}}</mat-icon>
+            <div class="item-info">
+              <span class="item-name">{{ item.name }}</span>
+              <span class="item-desc">{{ getItemDescription(item.type) }}</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="category">
-        <h4>Control Flow</h4>
+      <!-- Control Flow -->
+      <div class="palette-section">
+        <div class="section-header">Control Flow</div>
         <div class="palette-items">
           <div *ngFor="let item of items | filterByTypes:['condition', 'repeat', 'event']" 
                class="palette-item"
@@ -29,8 +34,11 @@
                  type: item.type,
                  data: item.data
                }">
-            <mat-icon>{{item.icon}}</mat-icon>
-            <span>{{ item.name }}</span>
+            <mat-icon class="item-icon">{{item.icon}}</mat-icon>
+            <div class="item-info">
+              <span class="item-name">{{ item.name }}</span>
+              <span class="item-desc">{{ getItemDescription(item.type) }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -68,30 +76,46 @@
     <div [ngSwitch]="selectedStep.type">
       <!-- Move Properties -->
       <div *ngSwitchCase="'move'" class="properties-form">
-        <mat-form-field appearance="outline">
-          <mat-label>X Position</mat-label>
-          <input matInput type="number" [(ngModel)]="selectedStep.data.params.x">
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Y Position</mat-label>
-          <input matInput type="number" [(ngModel)]="selectedStep.data.params.y">
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Speed</mat-label>
-          <input matInput type="number" [(ngModel)]="selectedStep.data.params.speed">
-        </mat-form-field>
+        <div class="property-group">
+          <div class="property-title">Position</div>
+          <div class="property-row">
+            <label>X Position</label>
+            <mat-form-field appearance="outline">
+              <input matInput type="number" [(ngModel)]="selectedStep.data.params.x">
+            </mat-form-field>
+          </div>
+          <div class="property-row">
+            <label>Y Position</label>
+            <mat-form-field appearance="outline">
+              <input matInput type="number" [(ngModel)]="selectedStep.data.params.y">
+            </mat-form-field>
+          </div>
+          <div class="property-row">
+            <label>Speed</label>
+            <mat-form-field appearance="outline">
+              <input matInput type="number" [(ngModel)]="selectedStep.data.params.speed">
+            </mat-form-field>
+          </div>
+        </div>
       </div>
 
       <!-- Rotate Properties -->
       <div *ngSwitchCase="'rotate'" class="properties-form">
-        <mat-form-field appearance="outline">
-          <mat-label>Degrees</mat-label>
-          <input matInput type="number" [(ngModel)]="selectedStep.data.params.degrees">
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Speed</mat-label>
-          <input matInput type="number" [(ngModel)]="selectedStep.data.params.speed">
-        </mat-form-field>
+        <div class="property-group">
+          <div class="property-title">Rotation</div>
+          <div class="property-row">
+            <label>Degrees</label>
+            <mat-form-field appearance="outline">
+              <input matInput type="number" [(ngModel)]="selectedStep.data.params.degrees">
+            </mat-form-field>
+          </div>
+          <div class="property-row">
+            <label>Speed</label>
+            <mat-form-field appearance="outline">
+              <input matInput type="number" [(ngModel)]="selectedStep.data.params.speed">
+            </mat-form-field>
+          </div>
+        </div>
       </div>
 
       <!-- Other property forms... -->
@@ -101,14 +125,23 @@
 
 <!-- Step Template -->
 <ng-template #stepTemplate let-step>
-  <div class="workflow-step" [ngClass]="step.type">
+  <div class="workflow-step" 
+       [ngClass]="[
+         step.type || '', 
+         getShapeClass(step.type) || ''
+       ]">
     <div class="step-wrapper">
       <div class="step-header">
         <mat-icon>{{getIconForType(step.type)}}</mat-icon>
         <span>{{step.data.name}}</span>
-        <button mat-icon-button class="delete-btn" (click)="deleteStep(step)">
-          <mat-icon>delete</mat-icon>
-        </button>
+        <div class="step-actions">
+          <button mat-icon-button class="edit-btn" (click)="editStep(step)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button class="delete-btn" (click)="deleteStep(step)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
       </div>
       <div class="step-content" *ngIf="step.data.params">
         <ng-container [ngSwitch]="step.type">

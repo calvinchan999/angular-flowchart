@@ -1,10 +1,11 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, OnInit } from '@angular/core';
 import { NgFlowchart, NgFlowchartStepComponent, NgFlowchartCanvasDirective } from '@joelwenzel/ng-flowchart';
 
 interface WorkflowAction {
   name: string;
   type: string;
   icon: string;
+  shape: string;
   data: {
     name: string;
     params?: any;
@@ -16,14 +17,27 @@ interface WorkflowAction {
   templateUrl: './workflow.component.html',
   styleUrls: ['./workflow.component.scss']
 })
-export class WorkflowComponent {
+export class WorkflowComponent implements OnInit {
   @ViewChild(NgFlowchartCanvasDirective) canvas!: NgFlowchartCanvasDirective;
   
   selectedStep: any = null;
-  callbacks: NgFlowchart.Callbacks = {};
+  
+  callbacks: NgFlowchart.Callbacks = {
+    onDropStep: (drop: NgFlowchart.DropEvent) => {
+      console.log('Step dropped', drop);
+      this.selectedStep = drop.step;
+    },
+    onDropError: (error: NgFlowchart.DropError) => {
+      console.log('Drop error', error);
+    }
+  };
+
   options: NgFlowchart.Options = {
     stepGap: 40,
-    rootPosition: 'TOP_CENTER',
+    rootPosition: 'FREE',
+    orientation: 'VERTICAL',
+    isSequential: false,
+    manualConnectors: true,
     zoom: {
       mode: 'WHEEL'
     }
@@ -34,12 +48,14 @@ export class WorkflowComponent {
       name: 'Start',
       type: 'start',
       icon: 'play_circle',
+      shape: 'circle',
       data: { name: 'Start' }
     },
     {
       name: 'Move To',
       type: 'move',
       icon: 'open_with',
+      shape: '',
       data: { 
         name: 'Move To',
         params: {
@@ -53,6 +69,7 @@ export class WorkflowComponent {
       name: 'Rotate',
       type: 'rotate',
       icon: 'rotate_right',
+      shape: '',
       data: { 
         name: 'Rotate',
         params: {
@@ -65,6 +82,7 @@ export class WorkflowComponent {
       name: 'Wait',
       type: 'wait',
       icon: 'timer',
+      shape: '',
       data: { 
         name: 'Wait',
         params: {
@@ -76,6 +94,7 @@ export class WorkflowComponent {
       name: 'If Condition',
       type: 'condition',
       icon: 'help',
+      shape: 'diamond',
       data: { 
         name: 'If Condition',
         params: {
@@ -89,6 +108,7 @@ export class WorkflowComponent {
       name: 'Repeat',
       type: 'repeat',
       icon: 'loop',
+      shape: '',
       data: { 
         name: 'Repeat',
         params: {
@@ -100,6 +120,7 @@ export class WorkflowComponent {
       name: 'When Event',
       type: 'event',
       icon: 'bolt',
+      shape: '',
       data: { 
         name: 'When Event',
         params: {
@@ -112,6 +133,7 @@ export class WorkflowComponent {
       name: 'Play Sound',
       type: 'sound',
       icon: 'volume_up',
+      shape: '',
       data: { 
         name: 'Play Sound',
         params: {
@@ -119,12 +141,25 @@ export class WorkflowComponent {
           volume: 1
         }
       }
+    },
+    {
+      name: 'Process',
+      type: 'process',
+      icon: 'settings',
+      shape: 'hexagon',
+      data: { 
+        name: 'Process',
+        params: {
+          action: ''
+        }
+      }
     }
   ];
 
-  constructor() {
-    this.callbacks.onDropError = this.onDropError.bind(this);
-    this.callbacks.onDropStep = this.onDropStep.bind(this);
+  constructor() {}
+
+  ngOnInit() {
+    // Initialize any required setup
   }
 
   getIconForType(type: string): string {
@@ -141,11 +176,51 @@ export class WorkflowComponent {
     console.log('Drop error', error);
   }
 
-  deleteStep(step: any) {
+  deleteStep(step: NgFlowchartStepComponent) {
     if (this.canvas) {
-      if (this.selectedStep && this.selectedStep.id === step.id) {
-        this.selectedStep = null;
+      const flow = this.canvas.getFlow();
+      if (flow) {
+        // flow.getStep(step.id)?.delete();
+        if (this.selectedStep && this.selectedStep.id === step.id) {
+          this.selectedStep = null;
+        }
       }
     }
+  }
+
+  editStep(step: any) {
+    this.selectedStep = step;
+    // Prevent event propagation to avoid triggering other click handlers
+    event?.stopPropagation();
+  }
+
+  getItemDescription(type: string): string {
+    switch (type) {
+      case 'start':
+        return 'Starting point of the workflow';
+      case 'move':
+        return 'Move to specific coordinates';
+      case 'rotate':
+        return 'Rotate by specified degrees';
+      case 'wait':
+        return 'Wait for specified duration';
+      case 'condition':
+        return 'Branch based on condition';
+      case 'repeat':
+        return 'Repeat actions multiple times';
+      case 'event':
+        return 'Trigger on specific event';
+      case 'sound':
+        return 'Play a sound effect';
+      case 'process':
+        return 'Process action';
+      default:
+        return '';
+    }
+  }
+
+  getShapeClass(type: string): string {
+    const item = this.items.find(i => i.type === type);
+    return item ? `shape-${item.shape}` : '';
   }
 } 
